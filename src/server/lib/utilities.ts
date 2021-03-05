@@ -7,6 +7,7 @@ import { exec } from './execProm';
 
 const utilities = {
     runHerokuBuilder: (): void => {
+        debugger;
         if (processWrapper.HEROKU_API_KEY && processWrapper.HEROKU_APP_NAME && !isLocal()) {
             exec(`heroku run:detached oneoffbuilder -a ${processWrapper.HEROKU_APP_NAME}`);
         } else if (isLocal()) {

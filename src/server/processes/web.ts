@@ -41,6 +41,7 @@ function wrapAsync(fn: any) {
 }
 
 const handleDeployRequest = async (message: DeployRequest, url: string) => {
+    debugger;
     if (message.visitor && !message.noPool) {
         message.visitor.pageview(url).send();
         message.visitor.event('Repo', getPoolKey(message, '-')).send();
@@ -85,6 +86,7 @@ app.get(
             return res.redirect(multiTemplateURLBuilder(req.query.template, '/#userinfo'));
         }
 
+        debugger;
         const message = await handleDeployRequest(await deployMsgFromExpressReq(req), '/launch');
         return res.redirect(`/#deploying/deployer/${message.deployId}`);
     })

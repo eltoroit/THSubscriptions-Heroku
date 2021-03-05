@@ -115,6 +115,7 @@ const getDeployRequest = async (log?: boolean) => {
 };
 
 const putDeployRequest = async (depReq: DeployRequest, log?: boolean) => {
+    debugger;
     await redis.rpush(deployRequestExchange, JSON.stringify(depReq));
     if (log) {
         logger.debug('redis: added to deploy queue', depReq);
