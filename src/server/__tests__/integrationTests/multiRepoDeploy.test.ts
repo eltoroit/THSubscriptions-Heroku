@@ -7,7 +7,7 @@ test(
     async () => {
         await deployCheckMulti(
             Object.keys(testRepos)
-                .flatMap(key => testRepos[key])
+                .flatMap((key) => testRepos[key])
                 .slice(0, 2)
         );
     },

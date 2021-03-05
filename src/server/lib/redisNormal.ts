@@ -45,16 +45,11 @@ const putHerokuCDS = async (cds: CDS): Promise<void> => {
 };
 
 const getHerokuCDSs = async (): Promise<CDS[]> => {
-    const CDSs: CDS[] = (await redis.lrange(herokuCDSExchange, 0, -1)).map((queueItem) =>
-        JSON.parse(queueItem)
-    );
+    const CDSs: CDS[] = (await redis.lrange(herokuCDSExchange, 0, -1)).map((queueItem) => JSON.parse(queueItem));
     return CDSs;
 };
 
-const getAppNamesFromHerokuCDSs = async (
-    salesforceUsername: string,
-    expecting = true
-): Promise<string[]> => {
+const getAppNamesFromHerokuCDSs = async (salesforceUsername: string, expecting = true): Promise<string[]> => {
     // get all the CDSs
     const herokuCDSs = await getHerokuCDSs();
 
@@ -62,9 +57,7 @@ const getAppNamesFromHerokuCDSs = async (
         return [];
     }
     // find the matching username
-    const matchedCDSIndex = herokuCDSs.findIndex(
-        (cds) => cds.mainUser.username === salesforceUsername
-    );
+    const matchedCDSIndex = herokuCDSs.findIndex((cds) => cds.mainUser.username === salesforceUsername);
 
     if (matchedCDSIndex < 0) {
         if (expecting) {
@@ -75,9 +68,7 @@ const getAppNamesFromHerokuCDSs = async (
         return [];
     }
 
-    logger.debug(
-        `found matching cds ${salesforceUsername} === ${herokuCDSs[matchedCDSIndex].mainUser.username}`
-    );
+    logger.debug(`found matching cds ${salesforceUsername} === ${herokuCDSs[matchedCDSIndex].mainUser.username}`);
 
     const matched = herokuCDSs.splice(matchedCDSIndex, 1);
 
@@ -181,8 +172,7 @@ const cdsRetrieve = async (deployId: string) => {
             errors: [
                 {
                     command: 'retrieval',
-                    error:
-                        'Results not found for your deployId. It may have been deleted or may have expired',
+                    error: 'Results not found for your deployId. It may have been deleted or may have expired',
                     raw: ''
                 }
             ]
@@ -229,11 +219,9 @@ const putPooledOrg = async (depReq: DeployRequest, poolMessage: CDS): Promise<vo
     await redis.rpush(key, JSON.stringify(poolMessage));
 };
 
-const getAllPooledOrgs = async (poolname: string): Promise<CDS[]> =>
-    (await redis.lrange(poolname, 0, -1)).map((msg) => JSON.parse(msg));
+const getAllPooledOrgs = async (poolname: string): Promise<CDS[]> => (await redis.lrange(poolname, 0, -1)).map((msg) => JSON.parse(msg));
 
-const getAllPooledOrgIDs = async (poolname: string): Promise<string[]> =>
-    (await getAllPooledOrgs(poolname)).map((cds) => cds.orgId);
+const getAllPooledOrgIDs = async (poolname: string): Promise<string[]> => (await getAllPooledOrgs(poolname)).map((cds) => cds.orgId);
 
 const getPoolDeployRequestQueueSize = async () => redis.llen(poolDeployExchange);
 
@@ -242,9 +230,7 @@ const getPoolDeployRequestQueueSize = async () => redis.llen(poolDeployExchange)
  */
 const getPoolDeployCountByRepo = async (pool: PoolConfig) => {
     const poolRequests = await redis.lrange(poolDeployExchange, 0, -1);
-    return poolRequests
-        .map((pr) => JSON.parse(pr))
-        .filter((pr: DeployRequest) => equal(pr.repos, pool.repos)).length;
+    return poolRequests.map((pr) => JSON.parse(pr)).filter((pr: DeployRequest) => equal(pr.repos, pool.repos)).length;
 };
 
 const putLead = async (lead) => {

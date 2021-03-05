@@ -8,7 +8,7 @@ const folder = 'src/server/__tests__/integrationTests/generatedRepos';
     await fs.emptyDir(folder);
 
     let flatRepos = [];
-    Object.keys(testRepos).forEach(key => {
+    Object.keys(testRepos).forEach((key) => {
         flatRepos = [...flatRepos, ...testRepos[key]];
     });
 
@@ -69,9 +69,7 @@ describe('pool for ${testRepo.username}/${testRepo.repo}', () => {
         
 });
 `;
-        const filename = testRepo.branch
-            ? `${folder}/${testRepo.username}-${testRepo.repo}-${testRepo.branch}.test.ts`
-            : `${folder}/${testRepo.username}-${testRepo.repo}.test.ts`;
+        const filename = testRepo.branch ? `${folder}/${testRepo.username}-${testRepo.repo}-${testRepo.branch}.test.ts` : `${folder}/${testRepo.username}-${testRepo.repo}.test.ts`;
         await fs.writeFile(filename, output);
 
         if (testRepo.testPool) {

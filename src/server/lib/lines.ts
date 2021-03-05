@@ -15,6 +15,7 @@ const getDisplayResults = async (path: string, username: string): Promise<SfdxDi
     (await exec2JSON(`sfdx force:org:display -u ${username} --json`, { cwd: path })).result as SfdxDisplayResult;
 
 const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => {
+    // ELTOROIT-READ: This executes each line of the file in repo
     // get the lines we'll run
     let lines;
     try {
@@ -70,10 +71,7 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
                         error: response.message,
                         raw: response
                     });
-                    logger.error(
-                        `error running line ${localLine} from deploy that includes ${msgJSON.repos[0].username}/${msgJSON.repos[0].repo}: ${response.message}`,
-                        response
-                    );
+                    logger.error(`error running line ${localLine} from deploy that includes ${msgJSON.repos[0].username}/${msgJSON.repos[0].repo}: ${response.message}`, response);
                 } else {
                     if (summary === commandSummary.OPEN) {
                         response = utilities.urlFix(response);
@@ -93,9 +91,7 @@ const lineRunner = async (msgJSON: DeployRequest, output: CDS): Promise<CDS> => 
                         output.mainUser.password = response.result.password;
                         output.mainUser.permalink = loginURL(output);
 
-                        commandResult.shortForm = `set password to ${response.result.password} for user ${
-                            response.result.username ?? output.mainUser.username
-                        }`;
+                        commandResult.shortForm = `set password to ${response.result.password} for user ${response.result.username ?? output.mainUser.username}`;
                     } else if (summary === commandSummary.HEROKU_DEPLOY) {
                         const HR: HerokuResult = {
                             appName: response.result.app.name,

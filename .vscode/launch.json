@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "node-terminal",
+            "name": "Run Script: ELTOROIT_TEST",
+            "request": "launch",
+            "command": "npm run ELTOROIT_TEST",
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

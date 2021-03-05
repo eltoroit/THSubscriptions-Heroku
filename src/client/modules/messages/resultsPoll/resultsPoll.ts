@@ -19,7 +19,7 @@ export default function resultsPoll(config: resultsPollConfig) {
   });
 }
 
-register(resultsPoll, eventTarget => {
+register(resultsPoll, (eventTarget) => {
   let config: resultsPollConfig = {};
   let pinger;
 

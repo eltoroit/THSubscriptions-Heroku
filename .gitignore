@@ -54,3 +54,4 @@ dist
 
 # specialized tests
 test/integrationTests/generatedRepos
+.DS_Store

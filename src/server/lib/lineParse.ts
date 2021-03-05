@@ -30,14 +30,10 @@ const byooFilter = (line: string): boolean => {
 
 const securityAssertions = (line: string): string => {
     if (!shellSanitize(line)) {
-        throw new Error(
-            `ERROR: Commands with metacharacters cannot be executed.  Put each command on a separate line.  Your command: ${line}`
-        );
+        throw new Error(`ERROR: Commands with metacharacters cannot be executed.  Put each command on a separate line.  Your command: ${line}`);
     }
     if (!line.startsWith('sfdx ')) {
-        throw new Error(
-            `ERROR: Commands must start with sfdx or be comments (security, yo!).  Your command: ${line}`
-        );
+        throw new Error(`ERROR: Commands must start with sfdx or be comments (security, yo!).  Your command: ${line}`);
     }
     if (line.includes(' -u ') || line.includes(' --targetusername ')) {
         throw new Error(
@@ -45,9 +41,7 @@ const securityAssertions = (line: string): string => {
         );
     }
     if (line.startsWith('sfdx plugins:')) {
-        throw new Error(
-            `ERROR: You can't install your own plugins.  See /src/server/lib/hubAuth for currently installed plugins.  Your command: ${line}`
-        );
+        throw new Error(`ERROR: You can't install your own plugins.  See /src/server/lib/hubAuth for currently installed plugins.  Your command: ${line}`);
     }
 
     return line;
@@ -81,10 +75,7 @@ const lineCorrections = (line: string, msgJSON: DeployRequest): string => {
     if (isByoo(msgJSON) && line.includes('sfdx force:source:push')) {
         const project = fs.readJSONSync(`tmp/${msgJSON.deployId}/sfdx-project.json`);
         // byoo might not be a scratch org, so we'll deploy it using deploy instead of push, referencing the project directories
-        return line.replace(
-            'sfdx force:source:push',
-            `sfdx force:source:deploy -p ${getPackageDirsFromFile(project)}`
-        );
+        return line.replace('sfdx force:source:push', `sfdx force:source:deploy -p ${getPackageDirsFromFile(project)}`);
     }
 
     return line;
@@ -108,47 +99,23 @@ const multiOrgCorrections = (lines: string[]): string[] =>
     // only one password allowed for (multi org).  [BYOO will have them already removed at this stage]
     thereCanBeOnlyOne(lines, 'user:password');
 const getMaxDays = (lines: string[]): number =>
-    Math.max(
-        ...lines
-            .filter((line) => line.includes('org:create'))
-            .map(
-                (line) =>
-                    parseInt(getArg(line, '-d'), 10) || parseInt(getArg(line, '--days'), 10) || 7
-            )
-    );
+    Math.max(...lines.filter((line) => line.includes('org:create')).map((line) => parseInt(getArg(line, '-d'), 10) || parseInt(getArg(line, '--days'), 10) || 7));
 
 const lineParse = async (msgJSON: DeployRequest): Promise<string[]> => {
-    let parsedLines = (
-        await filesToLines(
-            msgJSON.repos.map((repo) =>
-                isMultiRepo(msgJSON)
-                    ? `tmp/${msgJSON.deployId}/${repo.repo}/orgInit.sh`
-                    : `tmp/${msgJSON.deployId}/orgInit.sh`
-            )
-        )
-    )
-        .map((line) =>
-            msgJSON.repos.every((repo) => repo.whitelisted) ? line : securityAssertions(line)
-        )
+    let parsedLines = (await filesToLines(msgJSON.repos.map((repo) => (isMultiRepo(msgJSON) ? `tmp/${msgJSON.deployId}/${repo.repo}/orgInit.sh` : `tmp/${msgJSON.deployId}/orgInit.sh`))))
+        .map((line) => (msgJSON.repos.every((repo) => repo.whitelisted) ? line : securityAssertions(line)))
         .filter((line) => !isByoo(msgJSON) || byooFilter(line)) // let through if !byoo, and filter out create/password commands
         .map((line) => lineCorrections(line, msgJSON))
         .map((line) => jsonify(line));
 
     if (isByoo(msgJSON)) {
         // special auth scenario for byoo user
-        parsedLines.unshift(
-            `sfdx force:config:set defaultdevhubusername= defaultusername='${msgJSON.byoo.accessToken}' instanceUrl='${msgJSON.byoo.instanceUrl}' --json`
-        );
+        parsedLines.unshift(`sfdx force:config:set defaultdevhubusername= defaultusername='${msgJSON.byoo.accessToken}' instanceUrl='${msgJSON.byoo.instanceUrl}' --json`);
     }
 
     if (!isByoo(msgJSON) && isMultiRepo(msgJSON)) {
         // remove all the creates and put it at the beginning
-        parsedLines = [
-            `sfdx force:org:create -f config/project-scratch-def.json -d ${getMaxDays(
-                parsedLines
-            )} -s --json`,
-            ...parsedLines.filter((line) => !line.includes('org:create'))
-        ];
+        parsedLines = [`sfdx force:org:create -f config/project-scratch-def.json -d ${getMaxDays(parsedLines)} -s --json`, ...parsedLines.filter((line) => !line.includes('org:create'))];
     }
 
     if (isMultiRepo(msgJSON)) {

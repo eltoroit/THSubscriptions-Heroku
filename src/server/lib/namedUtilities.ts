@@ -18,9 +18,7 @@ const randomValueHex = (len: number): string =>
 const getKeyFromRepos = (repos: DeployRequestRepo[], separator = '.'): string =>
     repos
         .map((item) =>
-            item.branch
-                ? `${item.username.toLowerCase()}${separator}${item.repo.toLowerCase()}${separator}${item.branch}`
-                : `${item.username.toLowerCase()}${separator}${item.repo.toLowerCase()}`
+            item.branch ? `${item.username.toLowerCase()}${separator}${item.repo.toLowerCase()}${separator}${item.branch}` : `${item.username.toLowerCase()}${separator}${item.repo.toLowerCase()}`
         )
         .join(separator);
 
@@ -32,23 +30,13 @@ const getPackageDirsFromFile = (projectJSON: ProjectJSON): string =>
         .map((dir) => filterUnsanitized(dir))
         .join(',');
 
-const getDeployId = (username: string, repo: string): string =>
-    encodeURIComponent(`${username}-${repo}-${new Date().valueOf()}${randomValueHex(randomCharactersInDeployId)}`);
+const getDeployId = (username: string, repo: string): string => encodeURIComponent(`${username}-${repo}-${new Date().valueOf()}${randomValueHex(randomCharactersInDeployId)}`);
 
 const getCloneCommands = (depReq: DeployRequest): string[] => {
     if (depReq.repos.length === 1) {
-        return [
-            `git clone -b ${depReq.repos[0].branch ?? 'master'} --single-branch https://github.com/${depReq.repos[0].username}/${
-                depReq.repos[0].repo
-            }.git ${depReq.deployId}`
-        ];
+        return [`git clone -b ${depReq.repos[0].branch ?? 'master'} --single-branch https://github.com/${depReq.repos[0].username}/${depReq.repos[0].repo}.git ${depReq.deployId}`];
     }
-    return depReq.repos.map(
-        (repo) =>
-            `git clone -b ${repo.branch ?? 'master'} --single-branch https://github.com/${repo.username}/${repo.repo}.git ${depReq.deployId}/${
-                repo.repo
-            }`
-    );
+    return depReq.repos.map((repo) => `git clone -b ${repo.branch ?? 'master'} --single-branch https://github.com/${repo.username}/${repo.repo}.git ${depReq.deployId}/${repo.repo}`);
 };
 
 const isMultiRepo = (depReq: DeployRequest): boolean => {
@@ -111,9 +99,7 @@ const getPoolConfig = async (): Promise<PoolConfig[]> => {
         return pools.map((pool) => poolConversion(pool));
     }
     // single repo env config...ignore non-matching pools
-    return pools
-        .map((pool) => poolConversion(pool))
-        .filter((pool) => pool.repos.length === 1 && processWrapper.SINGLE_REPO.includes(`${pool.repos[0].repo}/${pool.repos[0].username}`));
+    return pools.map((pool) => poolConversion(pool)).filter((pool) => pool.repos.length === 1 && processWrapper.SINGLE_REPO.includes(`${pool.repos[0].repo}/${pool.repos[0].username}`));
 };
 
 const poolConversion = (oldPool: PoolConfigDeprecated): PoolConfig => {
@@ -135,15 +121,4 @@ const poolConversion = (oldPool: PoolConfigDeprecated): PoolConfig => {
     return newPool;
 };
 
-export {
-    getPoolName,
-    getPackageDirsFromFile,
-    getDeployId,
-    getCloneCommands,
-    isMultiRepo,
-    isByoo,
-    getArg,
-    getPoolKey,
-    getPoolConfig,
-    getKeyFromRepos
-};
+export { getPoolName, getPackageDirsFromFile, getDeployId, getCloneCommands, isMultiRepo, isByoo, getArg, getPoolKey, getPoolConfig, getKeyFromRepos };

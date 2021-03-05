@@ -20,10 +20,8 @@ const deployCheck = async (testRepo: TestRepo) => {
 
 const deployCheckMulti = async (testRepos: TestRepo[]) => {
     await fs.ensureDir('tmp');
-    const urls = testRepos.map(testRepo =>
-        testRepo.branch
-            ? `https://github.com/${testRepo.username}/${testRepo.repo}/tree/${testRepo.branch}`
-            : `https://github.com/${testRepo.username}/${testRepo.repo}`
+    const urls = testRepos.map((testRepo) =>
+        testRepo.branch ? `https://github.com/${testRepo.username}/${testRepo.repo}/tree/${testRepo.branch}` : `https://github.com/${testRepo.username}/${testRepo.repo}`
     );
 
     // console.debug(`URLS are`, urls);

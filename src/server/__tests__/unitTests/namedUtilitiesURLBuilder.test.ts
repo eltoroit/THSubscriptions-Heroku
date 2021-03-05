@@ -9,14 +9,10 @@ describe('argStripperTest', () => {
     });
 
     test('single template', () => {
-        expect(multiTemplateURLBuilder(templates)).toBe(
-            '?template=https://github.com/mshanemc/df17IntegrationWorkshops&template=https://github.com/mshanemc/codeForClicks'
-        );
+        expect(multiTemplateURLBuilder(templates)).toBe('?template=https://github.com/mshanemc/df17IntegrationWorkshops&template=https://github.com/mshanemc/codeForClicks');
     });
 
     test('with preQueryURL', () => {
-        expect(multiTemplateURLBuilder(templates, '/launch')).toBe(
-            '/launch?template=https://github.com/mshanemc/df17IntegrationWorkshops&template=https://github.com/mshanemc/codeForClicks'
-        );
+        expect(multiTemplateURLBuilder(templates, '/launch')).toBe('/launch?template=https://github.com/mshanemc/df17IntegrationWorkshops&template=https://github.com/mshanemc/codeForClicks');
     });
 });
