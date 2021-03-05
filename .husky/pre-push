@@ -1,0 +1,2 @@
+#!/bin/sh
+yarn run ELTOROIT_BUILD
