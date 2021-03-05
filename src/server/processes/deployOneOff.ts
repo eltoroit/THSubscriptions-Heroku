@@ -1,7 +1,8 @@
 /* eslint-disable no-await-in-loop */
 import logger from 'heroku-logger';
-import checkQueue from '../lib/deployQueueCheck';
 import { auth } from '../lib/hubAuth';
+import { isLocal } from '../lib/amIlocal';
+import checkQueue from '../lib/deployQueueCheck';
 import { getDeployRequestSize } from '../lib/redisNormal';
 
 (async () => {
@@ -12,6 +13,8 @@ import { getDeployRequestSize } from '../lib/redisNormal';
         await checkQueue();
     }
 
-    // eslint-disable-next-line no-process-exit
-    process.exit(0);
+    if (!isLocal()) {
+        // eslint-disable-next-line no-process-exit
+        process.exit(0);
+    }
 })();
