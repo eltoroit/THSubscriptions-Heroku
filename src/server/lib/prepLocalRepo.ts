@@ -33,6 +33,9 @@ const prepareRepo = async (msgJSON: DeployRequest, cds: CDS): Promise<CDS> => {
                 raw: gitCloneResult.stderr
             });
         } catch (err) {
+            // ELTOROIT:START - Display the error
+            logger.warn(JSON.stringify(err));
+            // ELTOROIT:END - Display the error
             logger.warn(`deployQueueCheck: bad repo--${command}`);
             cds.errors.push({
                 command,
