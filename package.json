@@ -4,7 +4,8 @@
     "description": "An application that will deploy an SFDX project from a public  Github repo",
     "main": "lib/processes/web.js",
     "scripts": {
-        "ET_Build": "clear && rm -rf node_modules && rm -f yarn.lock && yarn install && yarn build:client && yarn build:server && echo 'DONE' && date",
+        "ELTOROIT_TEST": "yarn build && heroku local web=1,orgbuilder=1",
+        "ELTOROIT_BUILD": "clear && rm -rf node_modules && rm -f yarn.lock && yarn install && yarn build:client && yarn build:server && echo 'DONE' && date",
         "build": "yarn build:client && yarn build:server",
         "build:server": "tsc -b ./src/server",
         "build:client": "lwc-services build -m production",
