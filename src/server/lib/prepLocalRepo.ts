@@ -46,14 +46,11 @@ const prepareRepo = async (msgJSON: DeployRequest, cds: CDS): Promise<CDS> => {
 };
 
 const prepOrgInit = async (msgJSON: DeployRequest): Promise<void> => {
+    // ELTOROIT-READ: This executes script file in repo
     const orgInitPath = `tmp/${msgJSON.deployId}/orgInit.sh`;
     logger.debug(`deployQueueCheck: going to look in the directory ${orgInitPath}`);
 
-    const paths = msgJSON.repos.map((repo) =>
-        isMultiRepo(msgJSON)
-            ? `tmp/${msgJSON.deployId}/${repo.repo}/orgInit.sh`
-            : `tmp/${msgJSON.deployId}/orgInit.sh`
-    );
+    const paths = msgJSON.repos.map((repo) => (isMultiRepo(msgJSON) ? `tmp/${msgJSON.deployId}/${repo.repo}/orgInit.sh` : `tmp/${msgJSON.deployId}/orgInit.sh`));
 
     for (const path of paths) {
         if (isByoo(msgJSON) && fs.existsSync(path.replace('orgInit', 'byooInit'))) {
@@ -79,13 +76,7 @@ const prepProjectScratchDef = async (msgJSON: DeployRequest): Promise<void> => {
             fs.writeJSON(
                 `tmp/${msgJSON.deployId}/config/${scratchDefFileName}`,
                 buildScratchDef({
-                    repoFileJSONs: await Promise.all(
-                        msgJSON.repos.map((repo) =>
-                            fs.readJSON(
-                                `tmp/${msgJSON.deployId}/${repo.repo}/config/${scratchDefFileName}`
-                            )
-                        )
-                    ),
+                    repoFileJSONs: await Promise.all(msgJSON.repos.map((repo) => fs.readJSON(`tmp/${msgJSON.deployId}/${repo.repo}/config/${scratchDefFileName}`))),
                     projectname: msgJSON.deployId
                 })
             ),
@@ -93,13 +84,7 @@ const prepProjectScratchDef = async (msgJSON: DeployRequest): Promise<void> => {
             fs.writeJSON(
                 `tmp/${msgJSON.deployId}/${projectDefFileName}`,
                 MergeProjectJSONs({
-                    projectJSONs: await Promise.all(
-                        msgJSON.repos.map((repo) =>
-                            fs.readJSON(
-                                `tmp/${msgJSON.deployId}/${repo.repo}/${projectDefFileName}`
-                            )
-                        )
-                    ),
+                    projectJSONs: await Promise.all(msgJSON.repos.map((repo) => fs.readJSON(`tmp/${msgJSON.deployId}/${repo.repo}/${projectDefFileName}`))),
                     localFilePaths: msgJSON.repos.map((repo) => repo.repo)
                 })
             )

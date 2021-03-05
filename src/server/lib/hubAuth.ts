@@ -26,9 +26,7 @@ const getKeypath = async (): Promise<string> => {
 };
 
 const buildJWTAuthCommand = async (username = processWrapper.HUB_USERNAME): Promise<string> =>
-    `sfdx force:auth:jwt:grant --clientid ${
-        processWrapper.CONSUMERKEY
-    } --username ${username} --jwtkeyfile ${await getKeypath()}`;
+    `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${username} --jwtkeyfile ${await getKeypath()}`;
 
 const auth = async (): Promise<string> => {
     // where will our cert live?
@@ -36,16 +34,17 @@ const auth = async (): Promise<string> => {
 
     try {
         if (!isLocal()) {
-            // not local, so link the plugins.  local runs will hae it already linked.
+            // not local, so link the plugins.  local runs will have it already linked.
             logger.debug('hubAuth: updating plugin');
             await exec('sfdx plugins:link node_modules/shane-sfdx-plugins');
             await exec('sfdx plugins:link node_modules/@salesforce/analytics'); // analytics sfx plugins
             await exec('sfdx plugins:link node_modules/@mshanemc/sfdx-migration-automatic');
             await exec('sfdx plugins:link node_modules/sfdmu');
+            await exec('sfdx plugins:link node_modules/etcopydata');
         }
 
         if (processWrapper.SFDX_PRERELEASE) {
-            // not local, so link the plugin.  local runs will hae it already linked.
+            // not local, so link the plugin.  local runs will have it already linked.
             logger.debug('hubAuth: installing pre-release plugin for sfdx');
             await exec('sfdx plugins:install salesforcedx@pre-release');
         }
