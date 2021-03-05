@@ -7,15 +7,7 @@ import jsforce from 'jsforce';
 
 import cors from 'cors';
 
-import {
-    putDeployRequest,
-    getKeys,
-    cdsDelete,
-    cdsRetrieve,
-    cdsPublish,
-    putLead,
-    getAllPooledOrgIDs
-} from '../lib/redisNormal';
+import { putDeployRequest, getKeys, cdsDelete, cdsRetrieve, cdsPublish, putLead, getAllPooledOrgIDs } from '../lib/redisNormal';
 import { deployMsgFromExpressReq, deployMsgFromAPI } from '../lib/deployMsgBuilder';
 import { utilities } from '../lib/utilities';
 import { getPoolKey } from '../lib/namedUtilities';
@@ -31,7 +23,7 @@ const app: express.Application = express();
 const port = processWrapper.PORT;
 
 app.listen(port, () => {
-    logger.info(`Example app listening on port ${port}!`);
+    logger.info(`Example app listening on port ${port}! ===> http://localhost:${port}`);
 });
 
 // app.use(favicon(path.join(__dirname, 'assets/favicons', 'favicon.ico')));
@@ -70,10 +62,7 @@ const handleDeployRequest = async (message: DeployRequest, url: string) => {
 app.post(
     '/trial',
     wrapAsync(async (req, res, next) => {
-        const [message] = await Promise.all([
-            handleDeployRequest(await deployMsgFromExpressReq(req), '/trial'),
-            putLead(req.body)
-        ]);
+        const [message] = await Promise.all([handleDeployRequest(await deployMsgFromExpressReq(req), '/trial'), putLead(req.body)]);
         // const [message] = await Promise.all([commonDeploy(req, '/trial'), putLead(req.body)]);
         logger.debug('trial request', message);
         res.redirect(`/#deploying/trial/${message.deployId}`);
@@ -110,35 +99,16 @@ app.post(
     })
 );
 
-app.get(
-    [
-        '/',
-        '/error',
-        '/deploying/:format/:deployId',
-        '/userinfo',
-        '/byoo',
-        '/testform',
-        '/deleteConfirm'
-    ],
-    (req, res, next) => {
-        res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
-    }
-);
+app.get(['/', '/error', '/deploying/:format/:deployId', '/userinfo', '/byoo', '/testform', '/deleteConfirm'], (req, res, next) => {
+    res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
+});
 
 app.get(['/byoo'], (req, res, next) => {
-    if (
-        processWrapper.BYOO_CALLBACK_URI &&
-        processWrapper.BYOO_CONSUMERKEY &&
-        processWrapper.BYOO_SECRET
-    ) {
+    if (processWrapper.BYOO_CALLBACK_URI && processWrapper.BYOO_CONSUMERKEY && processWrapper.BYOO_SECRET) {
         res.sendFile('index.html', { root: path.join(__dirname, '../../../dist') });
     } else {
         setImmediate(() => {
-            next(
-                new Error(
-                    'Connected app credentials not properly configured for Bring Your Own Org feature'
-                )
-            );
+            next(new Error('Connected app credentials not properly configured for Bring Your Own Org feature'));
         });
     }
 });
@@ -207,6 +177,19 @@ app.get(
         });
         const conn = new jsforce.Connection({ oauth2: byooOauth2 });
         const userinfo = await conn.authorize(req.query.code);
+
+        // ELTOROIT-START: Please ensure you are using correct username
+        let user: jsforce.QueryResult<any> = await conn.query(`SELECT Id, Username FROM User WHERE Id = '${userinfo.id}'`);
+        user = user.records[0].Username;
+        if (state.un) {
+            if (user !== state.un) {
+                throw new Error(`Please ensure you are using the username provided by the instructor:  [${state.un}]`);
+            }
+        } else {
+            // console.log(user);
+            throw new Error(`Unknown expected user, can't validate [${user}]`);
+        }
+        // ELTOROIT-END: Please ensure you are using correct username
 
         const message = await handleDeployRequest(
             await deployMsgFromExpressReq({
