@@ -16,9 +16,7 @@ const processWrapper = {
     BYOO_CALLBACK_URI: process.env.BYOO_CALLBACK_URI,
 
     // poolDrain credentials
-    PD_KEY: process.env.LOCAL_ONLY_KEY_PATH
-        ? fs.readFileSync(process.env.LOCAL_ONLY_KEY_PATH)
-        : process.env.PD_KEY,
+    PD_KEY: process.env.LOCAL_ONLY_KEY_PATH ? fs.readFileSync(process.env.LOCAL_ONLY_KEY_PATH) : process.env.PD_KEY,
     PD_USERNAME: process.env.PD_USERNAME,
     PD_CONSUMERKEY: process.env.PD_CONSUMERKEY,
     PD_CALLBACK_URI: process.env.PD_CALLBACK_URI,

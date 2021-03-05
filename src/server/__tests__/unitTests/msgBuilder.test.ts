@@ -123,10 +123,7 @@ describe('tests for post requests from using externalFields body', () => {
             firstname: 'test',
             lastname: 'test'
         };
-        await expect(deployMsgFromAPI(req)).rejects.toHaveProperty(
-            'message',
-            `invalid characters in '${req.repos[0].repo}'`
-        );
+        await expect(deployMsgFromAPI(req)).rejects.toHaveProperty('message', `invalid characters in '${req.repos[0].repo}'`);
     });
 });
 
@@ -188,14 +185,10 @@ describe('tests for get requests from express with url parameters', () => {
         test.concurrent('prevents bad urls', async () => {
             const req = {
                 query: {
-                    template:
-                        'https://github.com/mshanemc/df17IntegrationWorkshops/tree/master; wget http://'
+                    template: 'https://github.com/mshanemc/df17IntegrationWorkshops/tree/master; wget http://'
                 }
             };
-            await expect(deployMsgFromExpressReq(req)).rejects.toHaveProperty(
-                'message',
-                `invalid characters in '${req.query.template}'`
-            );
+            await expect(deployMsgFromExpressReq(req)).rejects.toHaveProperty('message', `invalid characters in '${req.query.template}'`);
         });
     });
 
@@ -231,10 +224,7 @@ describe('tests for get requests from express with url parameters', () => {
         test.concurrent('handles array of template', async () => {
             const req = {
                 query: {
-                    template: [
-                        'https://github.com/mshanemc/cg4Integrate',
-                        'https://github.com/mshanemc/df17IntegrationWorkshops'
-                    ]
+                    template: ['https://github.com/mshanemc/cg4Integrate', 'https://github.com/mshanemc/df17IntegrationWorkshops']
                 }
             };
 
@@ -260,10 +250,7 @@ describe('tests for get requests from express with url parameters', () => {
         test.concurrent('handles branch in array of template', async () => {
             const req = {
                 query: {
-                    template: [
-                        'https://github.com/mshanemc/cg4Integrate/tree/passwordSet',
-                        'https://github.com/mshanemc/df17IntegrationWorkshops'
-                    ]
+                    template: ['https://github.com/mshanemc/cg4Integrate/tree/passwordSet', 'https://github.com/mshanemc/df17IntegrationWorkshops']
                 }
             };
 

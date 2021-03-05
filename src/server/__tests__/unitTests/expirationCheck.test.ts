@@ -33,7 +33,7 @@ describe("tests the skimmer's expiration checks", () => {
         const orgs: CDS[] = new Array(5).fill(fineOrg, 0, 5);
         expect(orgs.length).toBe(5);
 
-        const messages = orgs.map(org => JSON.stringify(org));
+        const messages = orgs.map((org) => JSON.stringify(org));
 
         await redis.rpush('mshanemc.finepool', ...messages);
         const result = await checkExpiration({
@@ -58,9 +58,7 @@ describe("tests the skimmer's expiration checks", () => {
         expect(orgs.length).toBe(3);
 
         const badOrg = new CDS({
-            completeTimestamp: moment()
-                .subtract(5, 'days')
-                .toDate(),
+            completeTimestamp: moment().subtract(5, 'days').toDate(),
             deployId: `test-1234`,
             complete: true,
             mainUser: {
@@ -73,7 +71,7 @@ describe("tests the skimmer's expiration checks", () => {
         orgs.push(badOrg);
         expect(orgs.length).toBe(5);
 
-        const messages = orgs.map(org => JSON.stringify(org));
+        const messages = orgs.map((org) => JSON.stringify(org));
 
         await redis.rpush('mshanemc.mixedpool', ...messages);
         const result = await checkExpiration({

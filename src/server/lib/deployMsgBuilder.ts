@@ -60,9 +60,7 @@ const deployMsgFromExpressReq = async (req): Promise<DeployRequest> => {
             return {
                 username: filterAlphaHypenUnderscore(path.split('/')[0]),
                 repo: filterAlphaHypenUnderscore(path.split('/')[1]),
-                branch: path.includes('/tree/')
-                    ? filterAlphaHypenUnderscore(path.split('/tree/')[1])
-                    : undefined
+                branch: path.includes('/tree/') ? filterAlphaHypenUnderscore(path.split('/tree/')[1]) : undefined
             };
         })
     );

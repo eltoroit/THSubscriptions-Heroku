@@ -26,7 +26,7 @@ const requestAddToPool = async (testRepo: TestRepo, quantity = 1) => {
 
     // verify exists in poolRequests
     const allMessages = await redis.lrange('poolDeploys', 0, -1);
-    const msg = allMessages.map(msgIterator => JSON.parse(msgIterator)).find(msgIterator => msgIterator.repos[0].repo === testRepo.repo);
+    const msg = allMessages.map((msgIterator) => JSON.parse(msgIterator)).find((msgIterator) => msgIterator.repos[0].repo === testRepo.repo);
 
     expect(msg.repos[0].username).toBe(testRepo.username);
     expect(msg.repos[0].repo).toBe(testRepo.repo);
@@ -41,7 +41,7 @@ const requestBuildPool = async (testRepo: TestRepo, requireAuthable?: boolean) =
 
     // verify not in poolRequests
     const allMessages = await redis.lrange('poolDeploys', 0, -1);
-    const msg = allMessages.map(msgIterator => JSON.parse(msgIterator)).find(msgIterator => msgIterator.repos[0].repo === testRepo.repo);
+    const msg = allMessages.map((msgIterator) => JSON.parse(msgIterator)).find((msgIterator) => msgIterator.repos[0].repo === testRepo.repo);
     expect(msg).toBeFalsy();
 
     // verify in the pool for that repo

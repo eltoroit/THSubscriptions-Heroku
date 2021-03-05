@@ -69,9 +69,7 @@ describe('featureMerge', () => {
         expect(featureMerge([{ features: ['a', 'B'] }, { features: ['C', 'b'] }])).toEqual(expect.arrayContaining(['a', 'b', 'c']));
     });
     test('merges with undefineds', () => {
-        expect(featureMerge([{ features: ['a', 'B'] }, { features: ['C', 'b'] }, { features: undefined }])).toEqual(
-            expect.arrayContaining(['a', 'b', 'c'])
-        );
+        expect(featureMerge([{ features: ['a', 'B'] }, { features: ['C', 'b'] }, { features: undefined }])).toEqual(expect.arrayContaining(['a', 'b', 'c']));
     });
 });
 

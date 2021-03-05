@@ -29,11 +29,7 @@ const checkExpiration = async (pool: PoolConfig): Promise<string> => {
     if (allOrgs.length === 0) {
         return `pool ${poolname} is empty`;
     }
-    const goodOrgs = allOrgs
-        .filter(
-            (org) => moment().diff(moment(org.completeTimestamp), 'hours', true) <= pool.lifeHours
-        )
-        .map((org) => JSON.stringify(org));
+    const goodOrgs = allOrgs.filter((org) => moment().diff(moment(org.completeTimestamp), 'hours', true) <= pool.lifeHours).map((org) => JSON.stringify(org));
 
     if (goodOrgs.length === allOrgs.length) {
         return `all the orgs in pool ${poolname} are fine`;
@@ -48,12 +44,7 @@ const checkExpiration = async (pool: PoolConfig): Promise<string> => {
     }
 
     const expiredOrgs = allOrgs
-        .filter(
-            (org) =>
-                moment().diff(moment(org.completeTimestamp), 'hours', true) > pool.lifeHours &&
-                org.mainUser &&
-                org.mainUser.username
-        )
+        .filter((org) => moment().diff(moment(org.completeTimestamp), 'hours', true) > pool.lifeHours && org.mainUser && org.mainUser.username)
         .map((org) => JSON.stringify({ username: org.mainUser.username, delete: true }));
 
     if (expiredOrgs.length > 0) {
@@ -70,9 +61,7 @@ const skimmer = async (): Promise<void> => {
 
 const doesOrgExist = async (username: string): Promise<boolean> => {
     try {
-        const queryResult = await exec2JSON(
-            `sfdx force:data:soql:query -u ${processWrapper.HUB_USERNAME} -q "select status from ScratchOrgInfo where SignupUsername='${username}'" --json`
-        );
+        const queryResult = await exec2JSON(`sfdx force:data:soql:query -u ${processWrapper.HUB_USERNAME} -q "select status from ScratchOrgInfo where SignupUsername='${username}'" --json`);
         return !['Deleted', 'Error'].includes(queryResult.result.records[0].Status);
     } catch (e) {
         logger.error(`error checking hub for username ${username}`);
@@ -121,26 +110,16 @@ const removeOldDeployIds = async (): Promise<void> =>
             // logger.debug(`data with length ${keyResults.length}`, keyResults);
             // Pause the stream from scanning more keys until we've migrated the current keys.
             stream.pause();
-            const CDSs = ((await Promise.all(
-                keyResults
-                    .filter((id) => !id.includes('.'))
-                    .map((deployId) => cdsRetrieve(deployId))
-            )) as CDS[]).filter((cds) => cds.mainUser && cds.mainUser.username);
+            const CDSs = ((await Promise.all(keyResults.filter((id) => !id.includes('.')).map((deployId) => cdsRetrieve(deployId)))) as CDS[]).filter((cds) => cds.mainUser && cds.mainUser.username);
             logger.debug(`CDSs with length ${CDSs.length}`);
             await Promise.all(
                 CDSs.map((cds) => {
                     logger.debug(`has expiration ${cds.expirationDate}`);
-                    if (
-                        !cds.expirationDate &&
-                        moment().diff(moment(cds.browserStartTime), 'hours') > hoursToKeepBYOO
-                    ) {
+                    if (!cds.expirationDate && moment().diff(moment(cds.browserStartTime), 'hours') > hoursToKeepBYOO) {
                         return cdsDelete(cds.deployId);
                         // logger.debug('would delete');
                     }
-                    if (
-                        cds.expirationDate &&
-                        moment().isAfter(moment(cds.expirationDate).endOf('day'))
-                    ) {
+                    if (cds.expirationDate && moment().isAfter(moment(cds.expirationDate).endOf('day'))) {
                         return cdsDelete(cds.deployId);
                         // logger.debug('would delete');
                     }
@@ -164,9 +143,7 @@ const processDeleteQueue = async (): Promise<void> => {
                 const deleteReq = await getDeleteRequest();
                 logger.debug(`deleting org with username ${deleteReq.username}`);
 
-                await exec2JSON(
-                    `sfdx force:data:record:delete -u ${processWrapper.HUB_USERNAME} -s ActiveScratchOrg -w "SignupUsername='${deleteReq.username}'" --json`
-                ).catch((e) => {
+                await exec2JSON(`sfdx force:data:record:delete -u ${processWrapper.HUB_USERNAME} -s ActiveScratchOrg -w "SignupUsername='${deleteReq.username}'" --json`).catch((e) => {
                     logger.error(e);
                     logger.warn(`unable to delete org with username: ${deleteReq.username}`);
                 });

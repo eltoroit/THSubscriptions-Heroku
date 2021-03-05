@@ -10,14 +10,7 @@ const iterateCommandResults = async (repo: string, cds: CDS, msgJSON: DeployRequ
     try {
         // how long did the user wait until the open button appears
         cds.commandResults.forEach((commandResult) => {
-            msgJSON.visitor
-                .timing(
-                    'commandTiming',
-                    repo,
-                    timeBetweenStringified(commandResult.commandStartTimestamp, commandResult.commandCompleteTimestamp),
-                    commandResult.command
-                )
-                .send();
+            msgJSON.visitor.timing('commandTiming', repo, timeBetweenStringified(commandResult.commandStartTimestamp, commandResult.commandCompleteTimestamp), commandResult.command).send();
         });
     } catch (e) {
         logger.warn('GA command timestamps not firing', msgJSON);
