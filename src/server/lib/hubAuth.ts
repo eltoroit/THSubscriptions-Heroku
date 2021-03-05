@@ -25,8 +25,9 @@ const getKeypath = async (): Promise<string> => {
     return undefined;
 };
 
+// ELTOROIT - Put path in quotes
 const buildJWTAuthCommand = async (username = processWrapper.HUB_USERNAME): Promise<string> =>
-    `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${username} --jwtkeyfile ${await getKeypath()}`;
+    `sfdx force:auth:jwt:grant --clientid ${processWrapper.CONSUMERKEY} --username ${username} --jwtkeyfile "${await getKeypath()}"`;
 
 const auth = async (): Promise<string> => {
     // where will our cert live?
@@ -52,8 +53,8 @@ const auth = async (): Promise<string> => {
         if (processWrapper.HEROKU_API_KEY) {
             await exec('heroku update');
         }
-
-        await exec(`${await buildJWTAuthCommand()} --setdefaultdevhubusername -a hub --json`);
+        // ELTOROIT: Do not authenticate to a DevHub right now, because we do not have a single DevHub
+        // await exec(`${await buildJWTAuthCommand()} --setdefaultdevhubusername -a hub --json`);
     } catch (err) {
         logger.error('hubAuth', err);
         // eslint-disable-next-line no-process-exit
