@@ -1,7 +1,7 @@
 {
     "name": "SFDX Public Deployer",
     "description": "An application that will deploy an SFDX project from a public Github repo",
-    "repository": "https://github.com/mshanemc/deploy-to-sfdx",
+    "repository": "https://github.com/eltoroit/THSubscriptions-Heroku",
     "keywords": ["deploy", "sfdx", "salesforcedx"],
     "env": {
         "CONSUMERKEY": {
